@@ -32,6 +32,9 @@ int main() {
 		if (fgetc(lista) == '\n')						//na kraju datoteke mora biti prazan redak kako bi brojac dao tocnu vrijednost
 			br++;										//svaki put kada se ude u novi redak, vrsi se inkrementacija brojaca
 
+	/* if (br > 0)										//mozemo dodati ovaj dio koda ukoliko ne zelimo na kraju datoteke drzati prazan redak
+		br++; */
+
 	printf("Lista se sastoji od %d studenata\n\n", br);
 
 	stud = (Student *)malloc(br * sizeof(Student));		//alociramo memoriju za niz struktura studenata
