@@ -7,7 +7,7 @@
 typedef struct Student {
 	char ime[lName];
 	char prezime[lName];
-	float bodovi;
+	int bodovi;
 	float relBodovi;
 }Student;
 
@@ -15,11 +15,10 @@ void relativni(int, Student *);							//funkcija za racunanje relativnog broja b
 void ispis(int, Student *);								//funkcija za ispis liste studenata
 int main() {
 
-	int i;
+	int i = 0;
 	int br = 0;											//br - brojac (koliko studenata ima u listi (koliko ima redaka))
 	Student *stud;
 	FILE *lista;
-
 	lista = fopen("lista.txt", "r");
 
 	if (lista == NULL) {
@@ -27,15 +26,20 @@ int main() {
 		return -1;
 	}
 
-	while (feof(lista))
+	rewind(lista);
+
+	while (!feof(lista))
 		if (fgetc(lista) == '\n')
 			br++;										//svaki put kada se ude u novi redak, vrsi se inkrementacija brojaca
 
+	printf("Lista se sastoji od %d studenata\n\n", br);
+
 	stud = (Student *)malloc(br * sizeof(Student));		//alociramo memoriju za niz struktura studenata
 
-	for (i = 0; i < br; i++) {
-		fscanf(lista, "%s %s %f", stud[i].ime, stud[i].prezime, &stud[i].bodovi);
-	}
+	rewind(lista);
+
+	for (i = 0; i < br; i++)
+		fscanf(lista, "%s %s %d", stud[i].ime, stud[i].prezime, &stud[i].bodovi);
 
 	relativni(br, stud);
 
@@ -51,14 +55,14 @@ void relativni(int br, Student *stud) {
 	int i;
 	float maxBodovi;									//maksimalan broj bodova
 
-	maxBodovi = stud[0].bodovi;
+	maxBodovi = (float) stud[0].bodovi;
 
 	for (i = 0; i < br; i++)
 		if (stud[i].bodovi > maxBodovi)
-			maxBodovi = stud[i].bodovi;
+			maxBodovi = (float) stud[i].bodovi;
 
 	for (i = 0; i < br; i++)
-		stud[i].relBodovi = stud[i].bodovi / maxBodovi * 100;
+		stud[i].relBodovi = (float) stud[i].bodovi / maxBodovi * 100;
 
 }
 
@@ -66,8 +70,8 @@ void ispis(int br, Student *stud) {
 
 	int i;
 
-	printf("Ime		Prezime		Apsolutni br. bodova		Relativni br. bodova\n");
+	printf("Ime		 Prezime		Apsolutni br. bodova		Relativni br. bodova\n");
 	for (i = 0; i < br; i++)
-		printf("%s %-25s %11.2f %11.2f", stud[i].ime, stud[i].prezime, stud[i].bodovi, stud[i].relBodovi);
-    
+		printf("%-8s\t %-10s\t %18d\t %28.2f\n", stud[i].ime, stud[i].prezime, stud[i].bodovi, stud[i].relBodovi);
+
 }
