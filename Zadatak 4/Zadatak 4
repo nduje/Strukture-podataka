@@ -1,0 +1,74 @@
+#include<stdio.h>
+
+typedef struct Polinom * Pozicija;
+
+struct Polinom {							//definiramo strukturu polinom
+	int koef;
+	int eksp;
+	Pozicija next;
+};
+
+void Unos(Pozicija P)						//funkcija u kojoj se vrsi unos polinoma, odnosno clanova vezane liste u vezanu listu
+int UnosPolinoma1(Pozicija P1);				//funkcija u kojoj se vrsi unos prvog polinoma, odnosno unos elemenata u prvu vezanu listu					
+int UnosPolinoma2(Pozicija P1);				//funkcija u kojoj se vrsi unos drugog polinoma, odnosno unos elemenata u drugu vezanu listu
+Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2);			//funkcija koja zbraja 2 polinoma
+int main() {
+	
+	struct Polinom Head1, Head2;
+	Head1.next = NULL;
+	Head2.next = NULL;
+
+	puts("Unos polinoma se vrsi citanjem iz datoteke gdje prvi red"
+		"predstavlja prvi polinom, a drugi red drugi polinom."
+		"Brojevi su grupirani u parove, gdje je prvi 'clan' para"
+		"koeficijent, a drugi eksponent.");
+
+
+	UnosPolinoma1(&Head1);
+		
+	UnosPolinoma2(&Head2);
+	
+}
+
+void Unos(Pozicija P);
+
+int UnosPolinoma1(Pozicija P1) {
+	puts("Vrsi se unos prvog polinoma");
+
+	FILE *polinomi = fopen("polinomi.txt", "r");
+
+	if(polinomi == NULL)
+		if (polinomi == NULL) {										//provjera je li datoteka prazna
+		puts("Datoteka je prazna.");
+		return -1;
+	}
+	
+	fclose(polinomi);												//zatvaranje datoteke				
+	return 0;
+}
+
+int UnosPolinoma2(Pozicija P2) {
+	
+	puts("Vrsi se unos prvog polinoma");
+
+	FILE *polinomi = fopen("polinomi.txt", "r");
+
+	if(polinomi == NULL)
+		if (polinomi == NULL) {										//provjera je li datoteka prazna
+		puts("Datoteka je prazna.");
+		return -1;
+	}
+
+
+	while(1) {														//prelazi u novi red jer se drugi polinom nalazi u drugom redu
+		if (fgetc(polinomi) == '\n');
+		break;
+	}
+
+	fclose(polinomi);												//zatvaranje datoteke
+	return 0;
+}
+
+Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2) {
+
+}
