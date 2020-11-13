@@ -14,12 +14,16 @@ int UnosPolinoma1(Pozicija P1);			//funkcija u kojoj se vrsi unos prvog polinoma
 int UnosPolinoma2(Pozicija P1);			//funkcija u kojoj se vrsi unos drugog polinoma, odnosno unos elemenata u drugu vezanu listu
 void Unos(int koef, int eksp, Pozicija P);		//funkcija u kojoj se vrsi unos i sortiranje clanova polinoma u vezanu listu
 void Ispis(Pozicija P);					//funkcija koja ispisuje polinome liste
-//Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2);			//funkcija koja zbraja 2 polinoma
+void ZbrajanjePolinoma(Pozicija P1, Pozicija P2, Pozicija R);			//funkcija koja zbraja 2 polinoma
+int MnozenjePolinoma(Pozicija P1, Pozicija P2, Pozicija R);				//funkcija koja mnozi 2 polinoma
+void UnosS(Pozicija q, Pozicija R);										//od funkcije Unos() se razlikuje po tome sto kao argument prima adresu strukture
 int main() {
 
-	struct Polinom Head1, Head2;
+	struct Polinom Head1, Head2, Rezultat;
+	char izbor;
 	Head1.next = NULL;
 	Head2.next = NULL;
+	Rezultat.next = NULL;
 
 	puts("Unos polinoma se vrsi citanjem iz dvije datoteke, gdje je "
 		"jedna datoteka jedan polinom, a druga drugi.\n"
@@ -31,8 +35,26 @@ int main() {
 
 	UnosPolinoma2(&Head2);
 
+	printf("Izbornik:\nZ - zbrajanje polinoma\nM - mnozenje polinoma\n\n");
+	scanf(" %c", &izbor);
+
+	switch(izbor) {													//izbornik koristeci switch case
+	case 'Z':
+		puts("");
+		ZbrajanjePolinoma(Head1.next, Head2.next, &Rezultat);
+		break;
+	case 'M':
+		puts("");
+		MnozenjePolinoma(Head1.next, Head2.next, &Rezultat);
+		break;
+	default:
+		puts("Greska pri unosu.");
+		break;
+	}
+	
 	puts("");
 
+	return 0;
 }
 
 int UnosPolinoma1(Pozicija P1) {
@@ -120,6 +142,131 @@ void Unos(int koef, int eksp, Pozicija P) {
 
 }
 
-/*Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2) {
+void ZbrajanjePolinoma(Pozicija P1, Pozicija P2, Pozicija R) {		//vrsi se zbrajanje polinoma
+	Pozicija q, tempRez;
 
-}*/
+	tempRez = R;
+
+	while (P1 != NULL && P2 != NULL) {								//petlja se izvrsava dok su P1 i P2 razliciti od NULL
+
+		if (P1->eksp > P2 ->eksp) {									//ako je eksponent clana prvog polinoma veci od eksponenta drugog polinoma
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+			
+			q->eksp = P1->eksp;										//na ovaj nacin se osigurava ispis sortiranog polinoma
+			q->koef = P1->koef;
+
+			q->next = R->next;
+			R->next = q;
+
+			P1 = P1->next;
+			R = R->next;
+		}
+
+		else if (P1->eksp < P2->eksp) {								//ako je eksponent clana drugog polinoma veci od eksponenta prvog polinoma
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+
+			q->eksp = P2->eksp;										//na ovaj nacin se osigurava ispis sortiranog polinoma
+			q->koef = P2->koef;
+
+			q->next = R->next;
+			R->next = q;
+
+			P2 = P2->next;
+			R = R->next;
+		}
+
+		else if (P1->eksp == P2->eksp) {							//ako su eksponenti clanova prvog i drugog polinoma jednaki
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+
+			q->eksp = P1->eksp;
+			q->koef = P1->koef + P2->koef;							//koeficijent clana novog polinoma je tada zbroj koeficijenata clanova prvog i drugog
+
+			q->next = R->next;
+			R->next = q;
+
+			P1 = P1->next;
+			P2 = P2->next;
+
+			R = R->next;
+		}
+		
+	}
+
+	if (P1 != NULL) {												//slucaj ako smo dosli do kraja drugog polinoma
+		while (P1 != NULL) {										//prepisujemo ostatak prvog polinoma
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+
+			q->koef = P1->koef;
+			q->eksp = P1->eksp;
+
+			q->next = R->next;
+			R->next = q;
+
+			P1 =P1->next;
+			R = R->next;
+		}
+
+	}
+
+	if (P2 != NULL) {												//slucaj ako smo dosli do kraja prvog polinoma
+		while (P2 != NULL) {										//prepisujemo ostatak drugog polinoma
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+
+			q->koef = P2->koef;
+			q->eksp = P2->eksp;
+
+			q->next = R->next;
+			R->next = q;
+
+			P2 = P2->next;
+			R = R->next;
+		}
+
+	}
+
+	Ispis(tempRez->next);
+
+}
+
+int MnozenjePolinoma(Pozicija P1, Pozicija P2, Pozicija R) {		//nije dovrseno
+	Pozicija q, tempRez, tempP2;
+
+	tempRez = R;
+	tempP2 = P2;
+
+
+	if (P1 == NULL || P2 == NULL || R == NULL) {
+		puts("Greska!");
+		return -1;
+	}
+
+	while (P1 != NULL) {
+
+		while (P2 != NULL) {
+			
+			q = (Pozicija)malloc(sizeof(struct Polinom));
+
+			q->eksp = P1->eksp + P2->eksp;
+			q->koef = P1->koef * P2->koef;
+
+			UnosS(q, R);
+			
+			P2 = P2->next;
+		}
+
+		P1 = P1->next;
+		P2 = tempP2;
+	}
+
+	return 0;
+}
+
+void UnosS(Pozicija q, Pozicija R) {
+	
+	while (R->next != NULL && q->eksp <= R->next->eksp)				//dio koda "odgovoran" za sortiranje od vecem prema manjem
+		R = R->next;												//pokazivac se pomice sve dok eksponent novog elementa liste nije manji ili sljedecem elementu
+
+	q->next = R->next;												//"klasican" unos na "pocetak" (zapravo, unos na odredenu adresu)
+	R->next = q;
+	R = q;
+}
