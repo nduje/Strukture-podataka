@@ -1,4 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
+#include<malloc.h>
 
 typedef struct Polinom * Pozicija;
 
@@ -8,67 +10,116 @@ struct Polinom {							//definiramo strukturu polinom
 	Pozicija next;
 };
 
-void Unos(Pozicija P)						//funkcija u kojoj se vrsi unos polinoma, odnosno clanova vezane liste u vezanu listu
-int UnosPolinoma1(Pozicija P1);				//funkcija u kojoj se vrsi unos prvog polinoma, odnosno unos elemenata u prvu vezanu listu					
-int UnosPolinoma2(Pozicija P1);				//funkcija u kojoj se vrsi unos drugog polinoma, odnosno unos elemenata u drugu vezanu listu
-Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2);			//funkcija koja zbraja 2 polinoma
+int UnosPolinoma1(Pozicija P1);			//funkcija u kojoj se vrsi unos prvog polinoma, odnosno unos elemenata u prvu vezanu listu					
+int UnosPolinoma2(Pozicija P1);			//funkcija u kojoj se vrsi unos drugog polinoma, odnosno unos elemenata u drugu vezanu listu
+void Unos(int koef, int eksp, Pozicija P);		//funkcija u kojoj se vrsi unos i sortiranje clanova polinoma u vezanu listu
+void Ispis(Pozicija P);					//funkcija koja ispisuje polinome liste
+//Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2);			//funkcija koja zbraja 2 polinoma
 int main() {
-	
+
 	struct Polinom Head1, Head2;
 	Head1.next = NULL;
 	Head2.next = NULL;
 
-	puts("Unos polinoma se vrsi citanjem iz datoteke gdje prvi red"
-		"predstavlja prvi polinom, a drugi red drugi polinom."
-		"Brojevi su grupirani u parove, gdje je prvi 'clan' para"
+	puts("Unos polinoma se vrsi citanjem iz dvije datoteke, gdje je "
+		"jedna datoteka jedan polinom, a druga drugi.\n"
+		"Brojevi su grupirani u parove, gdje je prvi 'clan' para "
 		"koeficijent, a drugi eksponent.");
 
 
 	UnosPolinoma1(&Head1);
-		
+
 	UnosPolinoma2(&Head2);
-	
+
+	puts("");
+
 }
 
-void Unos(Pozicija P);
-
 int UnosPolinoma1(Pozicija P1) {
-	puts("Vrsi se unos prvog polinoma");
+	int tempKoef, tempEksp;
 
-	FILE *polinomi = fopen("polinomi.txt", "r");
+	printf("\nPrvi polinom glasi:\n");
 
-	if(polinomi == NULL)
-		if (polinomi == NULL) {										//provjera je li datoteka prazna
+	FILE *polinom1 = fopen("polinom1.txt", "r");
+
+	rewind(polinom1);												//vracamo pointer na pocetak datoteke
+
+	if (polinom1 == NULL) {											//provjera je li datoteka prazna
 		puts("Datoteka je prazna.");
 		return -1;
 	}
-	
-	fclose(polinomi);												//zatvaranje datoteke				
+
+	rewind(polinom1);
+
+	while (!feof(polinom1)) {
+		fscanf(polinom1, "%d %d", &tempKoef, &tempEksp);			//spremamo vrijednosti na privremene varijable
+		Unos(tempKoef, tempEksp, P1);								//saljemo te vrijednosti u funkciju za unos polinoma
+	}
+
+	Ispis(P1->next);												//ispis polinoma
+
+	fclose(polinom1);												//zatvaranje datoteke				
 	return 0;
 }
 
 int UnosPolinoma2(Pozicija P2) {
-	
-	puts("Vrsi se unos prvog polinoma");
+	int tempKoef, tempEksp;
 
-	FILE *polinomi = fopen("polinomi.txt", "r");
+	printf("\nDrugi polinom glasi:\n");
 
-	if(polinomi == NULL)
-		if (polinomi == NULL) {										//provjera je li datoteka prazna
+	FILE *polinom2 = fopen("polinom2.txt", "r");
+
+	rewind(polinom2);												//vracamo pointer na pocetak datoteke
+
+	if (polinom2 == NULL) {											//provjera je li datoteka prazna
 		puts("Datoteka je prazna.");
 		return -1;
 	}
 
+	rewind(polinom2);
 
-	while(1) {														//prelazi u novi red jer se drugi polinom nalazi u drugom redu
-		if (fgetc(polinomi) == '\n');
-		break;
+	while (!feof(polinom2)) {
+		fscanf(polinom2, "%d %d", &tempKoef, &tempEksp);
+		Unos(tempKoef, tempEksp, P2);
 	}
 
-	fclose(polinomi);												//zatvaranje datoteke
+	Ispis(P2->next);
+
+	fclose(polinom2);												//zatvaranje datoteke
 	return 0;
 }
 
-Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2) {
+void Ispis(Pozicija P) {
+
+	while (P != NULL) {
+		if(P->next != NULL)
+			printf("%d^%d + ", P->koef, P->eksp);
+		else
+			printf("%d^%d", P->koef, P->eksp);
+		P = P->next;
+	}
+
+	puts("");
 
 }
+
+void Unos(int koef, int eksp, Pozicija P) {
+	Pozicija q;
+
+	q = (Pozicija)malloc(sizeof(struct Polinom));					//alokacija memorije
+
+	q->koef = koef;
+	q->eksp = eksp;
+
+	while (P->next != NULL && q->eksp <= P->next->eksp)				//dio koda "odgovoran" za sortiranje od vecem prema manjem
+		P = P->next;												//pokazivac se pomice sve dok eksponent novog elementa liste nije manji ili sljedecem elementu
+
+	q->next = P->next;												//"klasican" unos na "pocetak" (zapravo, unos na odredenu adresu)
+	P->next = q;
+	P = q;
+
+}
+
+/*Pozicija ZbrajanjePolinoma(Pozicija P1, Pozicija P2) {
+
+}*/
