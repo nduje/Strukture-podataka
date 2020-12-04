@@ -12,11 +12,15 @@ struct Skupovi {										//definiramo strukturu
 void Lista(Pozicija P);								
 void Unos(int broj, Pozicija P);					//vrsi se sortirani unos u datoteku
 void Ispis(Pozicija P);								//funkcija koja ispisuje listu
+void Union(Pozicija P1, Pozicija P2, Pozicija U);			//funkcija koja racuna uniju dvija lista (koristim engleski naziv jer sam vec koristio ime unija kod deklaracije strukture)
+void Intersection(Pozicija P1, Pozicija P2, Pozicija P);	//funkcija koja racuna presjek dvija lista (koristim engleski naziv jer sam vec koristio ime unija kod deklaracije strukture)
 int main() {
-	struct Skupovi Broj1, Broj2;
+	struct Skupovi Broj1, Broj2, Unija, Presjek;
 	int n = 0, i = 0;									//privremena cjelobrojna varijabla koju saljemo u funkciju Unos()
 	Broj1.next = NULL;
 	Broj2.next = NULL;
+	Unija.next = NULL;
+	Presjek.next = NULL;
 
 	printf("Vrsi se unos prve liste.\n\n");
 
@@ -31,6 +35,20 @@ int main() {
 
 	printf("\nDruga lista glasi\n");
 	Ispis(Broj2.next);
+
+	puts("");
+
+	Union(&Broj1, &Broj2, &Unija);
+
+	printf("\nUnija dviju lista glasi: ");
+	Ispis(Unija.next);
+
+	puts("");
+
+	Intersection(&Broj1, &Broj2, &Presjek);
+
+	printf("\nPresjek dviju lista glasi: ");
+	Ispis(Presjek.next);
 
 	puts("");
 
@@ -82,6 +100,104 @@ void Ispis(Pozicija P) {
 	while (P != NULL) {
 		printf("%d ", P->broj);
 		P = P->next;
+	}
+
+}
+
+void Union(Pozicija P1, Pozicija P2, Pozicija U) {
+
+	Pozicija q;
+
+	P1 = P1->next;
+	P2 = P2->next;
+
+	while (P1 != NULL && P2 != NULL) {
+		
+		q = (Pozicija)malloc(sizeof(struct Skupovi));
+
+		if (P1->broj < P2->broj) {
+			q->broj = P1->broj;
+
+			Unos(q->broj, U);
+
+			P1 = P1->next;
+		}
+
+		else if (P1->broj > P2->broj) {
+			q->broj = P2->broj;
+
+			Unos(q->broj, U);
+
+			P2 = P2->next;
+		}
+
+		else if (P1->broj == P2->broj) {
+			q->broj = P1->broj;
+			
+			Unos(q->broj, U);
+
+			P1 = P1->next;
+			P2 = P2->next;
+		}
+	}
+
+	if (P1 == NULL) {
+		while (P2 != NULL) {
+			
+			q = (Pozicija)malloc(sizeof(struct Skupovi));
+			
+			q->broj = P2->broj;
+			
+			Unos(q->broj, U);
+
+			P2 = P2->next;
+		}
+	}
+
+	if (P2 == NULL) {
+		while (P1 != NULL) {
+			
+			q = (Pozicija)malloc(sizeof(struct Skupovi));
+			
+			q->broj = P1->broj;
+			
+			Unos(q->broj, U);
+
+			P1 = P1->next;
+		}
+	}
+
+}
+
+void Intersection(Pozicija P1, Pozicija P2, Pozicija P) {
+	
+	Pozicija tempP2 = P2;
+	Pozicija q;
+
+	P1 = P1->next;
+	P2 = P2->next;
+
+	while (P1 != NULL) {
+		while (P2 != NULL) {
+			if (P2->broj == P1->broj) {
+				
+				q = (Pozicija)malloc(sizeof(struct Skupovi));
+				
+				q->broj = P2->broj;
+				
+				Unos(q->broj, P);
+
+				P2 = tempP2;
+
+				break;
+			}
+
+			else
+				P2 = P2->next;
+		}
+
+		P1 = P2->next;
+		P2 = tempP2;
 	}
 
 }
