@@ -18,6 +18,7 @@ void PopRed(Pozicija P);						//funkcija koja skida broj iz reda
 void Ispis(Pozicija P);							//funkcija koja ispisuje vezanu listu
 int SwitchStog(Pozicija P);						//funkcija u kojoj se nalazi izbornik pomocu kojeg manipuliramo stogom
 int SwitchRed(Pozicija P);						//funkcija u kojoj se nalazi izbornik pomocu kojeg manipuliramo redom
+int Check(Pozicija P);							//funkcija koja provjerava je li stog/red prazan
 int main() {
 	char izbor;									//varijabla koja ce se koristit u izborniku
 	struct stogRed Stog, Red;
@@ -81,8 +82,12 @@ int SwitchStog(Pozicija P) {
 			break;
 
 		case 'R':
-			printf("Vrsi se skidanje broja sa stoga.\n\n");
-			PopStog(P);
+			if (Check(P) == 0)
+				printf("Greska. Stog je prazan.\n\n");
+			else {
+				printf("Vrsi se skidanje broja sa stoga.\n\n");
+				PopStog(P);
+			}
 			break;
 
 		case 'I':
@@ -129,8 +134,12 @@ int SwitchRed(Pozicija P) {
 			break;
 
 		case 'R':
-			printf("Vrsi se skidanje broja iz reda.\n\n");
-			PopRed(P);
+			if (Check(P) == 0)
+				printf("Greska. Red je prazan.\n\n");
+			else {
+				printf("Vrsi se skidanje broja iz reda.\n\n");
+				PopRed(P);
+			}
 			break;
 
 		case 'I':
@@ -222,4 +231,12 @@ void Ispis(Pozicija P) {
 		printf("%d ", P->broj);
 	}
 
+}
+
+int Check(Pozicija P) {
+
+	if (P->next == NULL)
+		return 0;
+	else
+		return 1;
 }
