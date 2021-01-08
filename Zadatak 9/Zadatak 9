@@ -1,0 +1,145 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+struct _node;
+typedef struct _node * Pozicija;
+typedef struct _node {
+	int broj;
+	Pozicija lijevo;
+	Pozicija desno;
+} Node;
+
+
+Pozicija createNode(int broj);
+Pozicija insert(Pozicija current, Pozicija el);
+void printInOrder(Pozicija current);
+Pozicija find(Pozicija current, int broj);
+Pozicija deleteNode(Pozicija current, int broj);
+Pozicija findMax(Pozicija current);
+Pozicija findMin(Pozicija current);
+int main(void){
+	Pozicija root = NULL;
+	Pozicija el = createNode(16);
+
+	root = insert(root, el);
+
+
+	return EXIT_SUCCESS;
+}
+
+Pozicija createNode(int broj){
+	Pozicija P = NULL;
+
+	P = (Pozicija)malloc(sizeof(Node));
+
+	if(P == NULL) {
+		printf("Memorija nije alocirana!\n\n");
+		return NULL;
+	}
+
+	P->broj = broj;
+	P->lijevo = NULL;
+	P->lijevo = NULL;
+
+	return P;
+}
+
+Pozicija insert(Pozicija current, Pozicija el){
+
+	if (current == NULL)
+		return el;
+
+	if (current->broj > el->broj)
+		current->lijevo = insert(current->lijevo, el);
+
+	else if (current->broj < el->broj)
+		current->desno = insert(current->desno, el);
+
+	else {
+		printf("%d vec postoji u stablu.\n\n", el->broj);
+		free(el);
+	}
+
+	return current;
+}
+
+void printInOrder(Pozicija current) {
+	if (current == NULL)
+		return;
+
+	printfInOrder(current->lijevo);
+	printf("%d ", current->broj);
+	printfInOrder(current->desno);
+}
+
+Pozicija find(Pozicija current, int broj){
+	
+	if (current == NULL)
+		return NULL;
+
+	if (current->broj == broj)
+		return current;
+
+	else if(current->broj > broj)
+		return find(current->lijevo, broj);
+	
+	else /* if(current->broj > broj) */
+		return find(current->desno, broj);
+}
+
+Pozicija deleteNode(Pozicija current, int broj) {
+
+	if (current == NULL)
+		return NULL;
+
+	if (current->broj == broj) {
+	
+		if (current->lijevo != NULL) {
+			Pozicija temp = findMax(current->lijevo);
+			current->broj = temp->broj;
+			current->lijevo = deleteNode(current->lijevo, temp->broj);
+		}
+
+		else if (current->desno != NULL) {
+			Pozicija temp = findMin(current->desno);
+			current->broj = temp->broj;
+			current->desno = deleteNode(current->desno, temp->broj);
+		}
+
+		else {
+			free(current);
+			return NULL;
+		}
+	}
+
+	else if (current->broj < broj)
+		current->lijevo = deleteNode(current->lijevo, broj);
+	
+	else /* if (current->broj > broj) */
+		 current->desno = deleteNode(current->desno, broj);
+
+	return current;
+}
+
+Pozicija findMax(Pozicija current) {
+
+	if (current == NULL)
+		return NULL;
+
+	while (current->desno != NULL)
+		current = current->desno;
+
+	return current;
+}
+
+Pozicija findMin(Pozicija current) {
+
+	if (current == NULL)
+		return NULL;
+
+	while (current->lijevo != NULL)
+		current = current->lijevo;
+
+	return current;
+}
