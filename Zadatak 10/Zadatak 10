@@ -1,0 +1,37 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct node * Pozicija;
+
+
+
+typedef struct node
+{
+	char* Op;
+	Pozicija Left;
+	Pozicija Right;
+}Node;
+
+typedef struct stog
+{
+	Pozicija Op;
+	Pozicija Next;
+}Stog;
+
+Pozicija printInOrder(Pozicija P);
+
+int main(){
+
+	return 0;
+}
+
+Pozicija printInOrder(Pozicija P){
+	if(P == NULL)
+		return NULL;
+
+	printInOrder(P->Left);
+	printf(" %s ", &P->Op);
+	printInOrder(P->Right);
+}
