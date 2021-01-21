@@ -1,37 +1,231 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
-typedef struct node * Pozicija;
+typedef struct Node* pNode;
+typedef struct El* pEl;
 
+typedef struct Node {
+	char item[16];
+	pNode L;
+	pNode R;
 
+}_Node;
 
-typedef struct node
+typedef struct El {
+	pNode Adresa;
+	pEl Next;
+}_El;
+
+int bufferSize(FILE*);
+pNode readFromBuffer(char*);
+pNode createNode(char*);
+int push(pEl, pNode);
+int ispisStoga(pEl);
+pNode pop(pEl);
+void printInOrder(pNode, char*);
+int addChildren(pNode Left, pNode Right, pNode Root);
+
+int main()
 {
-	char* Op;
-	Pozicija Left;
-	Pozicija Right;
-}Node;
+	pNode root;
+	_El stack;
+	FILE* fp;
+	char* read_buffer;
+	FILE* fp_out;
+	char* infix_str;
+	int buffer_size = 0;
 
-typedef struct stog
+	fp = fopen("postfix.txt", "r");
+
+	if (fp == NULL) {
+		puts("Greska u otvaranju datoteke!");
+		return -1;
+	}
+
+	buffer_size = bufferSize(fp);
+	read_buffer = (char*)calloc(buffer_size + 10, sizeof(char));
+	infix_str = (char*)calloc(buffer_size + 10, sizeof(char));
+	fread(read_buffer, buffer_size, 1, fp);
+	*(read_buffer + buffer_size) = ' ';
+
+	printf("Procitani buffer je %s\n", read_buffer);
+
+	root = readFromBuffer(read_buffer);
+	fclose(fp);
+
+	printf("Infix izraz: ");
+	printInOrder(root, infix_str);
+	puts("");
+
+	printf("infix_str =====> %s\n", infix_str);
+	fp_out = fopen("infix.txt", "w");
+
+	if (fp_out == NULL) {
+		puts("Greska kod otvaranja datoteke!");
+		return -1;
+	}
+
+	fwrite(infix_str, 1, buffer_size + 1, fp_out);
+	fclose(fp_out);
+
+	system("pause");
+	return 0;
+}
+
+int bufferSize(FILE* fp)
 {
-	Pozicija Op;
-	Pozicija Next;
-}Stog;
+	int buffer_size = 0;
 
-Pozicija printInOrder(Pozicija P);
+	fseek(fp, 0, SEEK_END);
+	buffer_size = ftell(fp);
 
-int main(){
+	printf("Velicina buffera je %d znakova\n", buffer_size);
+	rewind(fp);
+
+	return buffer_size;
+}
+
+pNode readFromBuffer(char* buffer)
+{
+	int r = 0;
+	int num;
+	int n = 0;
+	int offset = 0;
+	char operator[16];
+	pNode Root = (pNode)malloc(sizeof(_Node));
+	char arg[16];
+	pNode newNode;
+	pNode Left;
+	pNode Right;
+
+	_El stack;
+	stack.Next = NULL;
+
+	while (*buffer != EOF) {
+
+		printf("Ostatak buffera: %s\n", buffer);
+		r = sscanf(buffer, "%d%n", &num, &n);
+
+		if (r == 1) {
+			printf("Procitan broj: %d\n", num);
+			buffer += n;
+
+			sprintf(arg, "%d", num);
+
+			newNode = createNode(arg);
+			push(&stack, newNode);
+		}
+		else if (r == 0) {
+			r = sscanf(buffer, " %s%n", operator, &n);
+			buffer += n;
+
+			strcpy(arg, operator);
+			newNode = createNode(arg);
+			Root = newNode;
+
+			Right = pop(&stack);
+			Left = pop(&stack);
+			addChildren(Left, Right, Root);
+			printf("Djeca cvora %s su: %s %s\n", Root->item, Root->R->item, Root->L->item);
+
+			push(&stack, newNode);
+		}
+		else if (r == EOF) {
+			break;
+		}
+		ispisStoga(&stack);
+
+	}
+	return Root;
+}
+
+pNode createNode(char* Value) {
+	pNode P = NULL;
+
+	P = (pNode)malloc(sizeof(_Node));
+
+	if (NULL == P) {
+		puts("Memory error!");
+		return NULL;
+	}
+
+	strcpy(P->item, Value);
+	P->L = NULL;
+	P->R = NULL;
+	printf("Stvoren cvor %s\n", P->item);
+
+	return P;
+}
+
+int push(pEl P, pNode tNode)
+{
+
+	pEl novi;
+
+	if (P == NULL) {
+		puts("Neispravan argument, null pokazivac.");
+		return -1;
+	}
+
+	novi = (pEl)malloc(sizeof(_El));
+	novi->Adresa = tNode;
+	printf("Dodan novi element u stog ==> %s\n", tNode->item);
+
+	novi->Next = P->Next;
+	P->Next = novi;
 
 	return 0;
 }
 
-Pozicija printInOrder(Pozicija P){
-	if(P == NULL)
-		return NULL;
+int ispisStoga(pEl P)
+{
+	P = P->Next;
 
-	printInOrder(P->Left);
-	printf(" %s ", &P->Op);
-	printInOrder(P->Right);
+	printf("Ispis stoga: ");
+	while (P != NULL) {
+		printf("%s ", P->Adresa->item);
+		P = P->Next;
+	}
+
+	puts("");
+
+	return 0;
+}
+
+pNode pop(pEl P)
+{
+	pEl temp;
+	pNode copy_adress;
+
+	temp = P->Next;
+	P->Next = temp->Next;
+
+	copy_adress = temp->Adresa;
+
+	printf("Uklonjen element sa stoga: %s\n", temp->Adresa->item);
+	free(temp);
+
+	return copy_adress;
+}
+
+void printInOrder(pNode Current, char* Str)
+{
+	if (Current == NULL)
+		return;
+
+	printInOrder(Current->L, Str);
+	printf("%s ", Current->item);
+	strcat(Str, " ");
+	strcat(Str, Current->item);
+	printInOrder(Current->R, Str);
+}
+
+int addChildren(pNode argLeft, pNode argRight, pNode Root)
+{
+	Root->L = argLeft;
+	Root->R = argRight;
+
+	return 0;
 }
